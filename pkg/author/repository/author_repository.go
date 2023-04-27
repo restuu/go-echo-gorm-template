@@ -11,30 +11,51 @@ import (
 // AuthorRepository ...
 type AuthorRepository interface {
 	FindAll(context.Context) ([]model.Author, error)
+	FindByID(ctx context.Context, authorID uint64) (*model.Author, error)
 }
 
 var (
-	_userRepository     AuthorRepository
-	_userRepositoryOnce sync.Once
+	_authorRepository   AuthorRepository
+	_authorRepositoryOnce sync.Once
 )
 
-type userRepository struct {
+type authorRepository struct {
 	model *gorm.DB
 }
 
-func (u *userRepository) FindAll(ctx context.Context) (users []model.Author, err error) {
-	err = u.model.Find(&users).Error
+func (r *authorRepository) FindAll(ctx context.Context) (authors []model.Author, err error) {
+	authors = []model.Author{}
+
+	err = r.model.
+		WithContext(ctx).
+		Find(&authors).
+		Error
 
 	return
 }
 
+func (r *authorRepository) FindByID(ctx context.Context, authorID uint64) (*model.Author, error) {
+	author := new(model.Author)
+
+	err := r.model.
+		WithContext(ctx).
+		First(author, authorID).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return author, nil
+}
+
 // NewUserRepository ...
 func NewUserRepository(db *gorm.DB) AuthorRepository {
-	_userRepositoryOnce.Do(func() {
-		_userRepository = &userRepository{
+	_authorRepositoryOnce.Do(func() {
+		_authorRepository = &authorRepository{
 			model: db.Model(&model.Author{}),
 		}
 	})
 
-	return _userRepository
+	return _authorRepository
 }
