@@ -2,6 +2,7 @@ package main
 
 import (
 	userRouter "go-echo-gorm-tempate/pkg/author/router"
+	bookRouter "go-echo-gorm-tempate/pkg/book/router"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -19,4 +20,5 @@ func initializeRouter() *echo.Echo {
 
 func registerRouters(e *echo.Echo, services *services) {
 	userRouter.NewAuthorRouter(e, services.AuthorRouterService)
+	bookRouter.NewBookRouter(e, services.BookRouterService)
 }

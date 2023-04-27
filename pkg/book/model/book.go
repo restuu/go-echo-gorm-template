@@ -1,12 +1,16 @@
 package model
 
-import "time"
+import (
+	authorModel "go-echo-gorm-tempate/pkg/author/model"
+	"time"
+)
 
 // Book ...
 type Book struct {
-	ID        uint64    `gorm:"primaryKey" json:"id"`
-	Title     string    `gorm:"not null" json:"full_name"`
-	AuthorID  uint64    `gorm:"not null" json:"author_id"`
+	ID        uint64 `gorm:"primaryKey" json:"id"`
+	Title     string `gorm:"not null" json:"full_name"`
+	AuthorID  uint64 `gorm:"not null" json:"author_id"`
+	Author    *authorModel.Author
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	CreatedBy string    `gorm:"not null" json:"created_by"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`

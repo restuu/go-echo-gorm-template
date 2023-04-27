@@ -8,6 +8,9 @@ import (
 	authorRepository "go-echo-gorm-tempate/pkg/author/repository"
 	authorRouter "go-echo-gorm-tempate/pkg/author/router"
 	authorService "go-echo-gorm-tempate/pkg/author/service"
+	bookRepository "go-echo-gorm-tempate/pkg/book/repository"
+	bookRouter "go-echo-gorm-tempate/pkg/book/router"
+	bookService "go-echo-gorm-tempate/pkg/book/service"
 	"go-echo-gorm-tempate/pkg/config"
 
 	"github.com/google/wire"
@@ -15,6 +18,7 @@ import (
 
 type services struct {
 	authorRouter.AuthorRouterService
+	bookRouter.BookRouterService
 }
 
 func initializeServices(ctx context.Context, conf *config.Config) (*services, error) {
@@ -22,8 +26,11 @@ func initializeServices(ctx context.Context, conf *config.Config) (*services, er
 	wire.Build(
 		newDB,
 		authorRepository.NewUserRepository,
+		bookRepository.NewBookRepository,
 		authorService.NewUserGettingService,
+		bookService.NewBookGettingService,
 		wire.Struct(new(authorRouter.AuthorRouterService), "*"),
+		wire.Struct(new(bookRouter.BookRouterService), "*"),
 		wire.Struct(new(services), "*"),
 	)
 

@@ -11,6 +11,9 @@ import (
 	"go-echo-gorm-tempate/pkg/author/repository"
 	"go-echo-gorm-tempate/pkg/author/router"
 	"go-echo-gorm-tempate/pkg/author/service"
+	repository2 "go-echo-gorm-tempate/pkg/book/repository"
+	router2 "go-echo-gorm-tempate/pkg/book/router"
+	service2 "go-echo-gorm-tempate/pkg/book/service"
 	"go-echo-gorm-tempate/pkg/config"
 )
 
@@ -26,8 +29,14 @@ func initializeServices(ctx context.Context, conf *config.Config) (*services, er
 	authorRouterService := router.AuthorRouterService{
 		UserGettingService: authorGettingService,
 	}
+	bookRepository := repository2.NewBookRepository(db)
+	bookGettingService := service2.NewBookGettingService(bookRepository)
+	bookRouterService := router2.BookRouterService{
+		BookGettingService: bookGettingService,
+	}
 	mainServices := &services{
 		AuthorRouterService: authorRouterService,
+		BookRouterService:   bookRouterService,
 	}
 	return mainServices, nil
 }
@@ -36,4 +45,5 @@ func initializeServices(ctx context.Context, conf *config.Config) (*services, er
 
 type services struct {
 	router.AuthorRouterService
+	router2.BookRouterService
 }

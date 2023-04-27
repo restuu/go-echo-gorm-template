@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // BookRepository ...
@@ -27,7 +28,11 @@ type bookRepository struct {
 func (r *bookRepository) FindAll(ctx context.Context) ([]model.Book, error) {
 	books := []model.Book{}
 
-	err := r.model.WithContext(ctx).Find(&books).Error
+	err := r.model.
+		WithContext(ctx).
+		Preload(clause.Associations).
+		Find(&books).
+		Error
 
 	return books, err
 }
@@ -38,6 +43,7 @@ func (r *bookRepository) FindByAuthor(ctx context.Context, authorID uint64) ([]m
 
 	err := r.model.
 		WithContext(ctx).
+		Preload(clause.Associations).
 		Where(&model.Book{AuthorID: authorID}).
 		Find(&books).
 		Error
