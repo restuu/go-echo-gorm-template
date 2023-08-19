@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -30,7 +30,12 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		startServer(cmd.Context())
+		app, err := Init(cmd.Context())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		app.start()
 	},
 }
 
@@ -50,7 +55,13 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-echo-gorm-tempate.yaml)")
+	rootCmd.PersistentFlags().
+		StringVar(
+			&cfgFile,
+			"config",
+			"",
+			"config file (default is $HOME/.go-echo-gorm-tempate.yaml)",
+		)
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -77,6 +88,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		log.Fatal(err)
 	}
 }
