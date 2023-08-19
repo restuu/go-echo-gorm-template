@@ -8,42 +8,41 @@ package main
 
 import (
 	"context"
-	"go-echo-gorm-tempate/pkg/author/repository"
-	"go-echo-gorm-tempate/pkg/author/router"
-	"go-echo-gorm-tempate/pkg/author/service"
-	repository2 "go-echo-gorm-tempate/pkg/book/repository"
-	router2 "go-echo-gorm-tempate/pkg/book/router"
-	service2 "go-echo-gorm-tempate/pkg/book/service"
-	"go-echo-gorm-tempate/pkg/config"
+	"github.com/google/wire"
+	"go-echo-gorm-tempate/adapter/config"
+	"go-echo-gorm-tempate/app/author"
+	"go-echo-gorm-tempate/app/book"
 )
 
-// Injectors from wire_services.go:
+// Injectors from wire.go:
 
-func initializeServices(ctx context.Context, conf *config.Config) (*services, error) {
-	db, err := newDB(ctx, conf)
+func Init(ctx context.Context) (*App, error) {
+	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
 	}
-	authorRepository := repository.NewUserRepository(db)
-	authorGettingService := service.NewUserGettingService(authorRepository)
-	authorRouterService := router.AuthorRouterService{
-		UserGettingService: authorGettingService,
+	db, err := newDB(ctx, configConfig)
+	if err != nil {
+		return nil, err
 	}
-	bookRepository := repository2.NewBookRepository(db)
-	bookGettingService := service2.NewBookGettingService(bookRepository)
-	bookRouterService := router2.BookRouterService{
-		BookGettingService: bookGettingService,
+	authorRepository := author.NewAuthorRepository(db)
+	authorUsecase := author.NewAuthorUsecase(authorRepository)
+	bookRepository := book.NewBookRepository(db)
+	bookUsecase := book.NewBookUsecase(bookRepository)
+	usecases := Usecases{
+		AuthorService: authorUsecase,
+		BookService:   bookUsecase,
 	}
-	mainServices := &services{
-		AuthorRouterService: authorRouterService,
-		BookRouterService:   bookRouterService,
+	app := &App{
+		Usecases: usecases,
+		Config:   configConfig,
+		Context:  ctx,
 	}
-	return mainServices, nil
+	return app, nil
 }
 
-// wire_services.go:
+// wire.go:
 
-type services struct {
-	router.AuthorRouterService
-	router2.BookRouterService
-}
+var (
+	usecasesProvider = wire.NewSet(author.NewAuthorUsecase, book.NewBookUsecase, wire.Struct(new(Usecases), "*"))
+)

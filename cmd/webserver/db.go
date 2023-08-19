@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"go-echo-gorm-tempate/pkg/config"
-	"go-echo-gorm-tempate/pkg/datastore"
+	"go-echo-gorm-tempate/adapter/config"
+	"go-echo-gorm-tempate/adapter/datastore"
 
 	"gorm.io/gorm"
 )

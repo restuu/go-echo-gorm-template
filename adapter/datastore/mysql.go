@@ -20,6 +20,5 @@ func Open(ctx context.Context, url DatabaseURL) (*gorm.DB, error) {
 		DontSupportRenameColumn:   true,  // `change` when rename column, rename column not supported before MySQL 8, MariaDB
 		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
 	}), &gorm.Config{})
-
 	return db, err
 }
